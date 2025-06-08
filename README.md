@@ -1,54 +1,116 @@
 # React Component Color
 
-React ComponentをServer/Client Componentで色分けするVSCode拡張機能です。
+A VS Code extension that provides visual color coding for React components based on whether they are Server Components or Client Components in modern React applications.
 
-## 機能
+## Features
 
-- JSX/TSXファイル内のReactコンポーネントを自動検出
-- `'use client'`ディレクティブの有無でServer/Client Componentを判定
-- コンポーネントを設定可能な色で視覚的に区別
-- リアルタイムでの色付け更新
+- 🎨 **Visual Component Identification**: Automatically detects and color-codes JSX/TSX components
+- 🔍 **Smart Detection**: Identifies Server vs Client Components by analyzing `'use client'` directives
+- ⚙️ **Highly Customizable**: Configure colors for background, border, underline, and text separately
+- 🔄 **Real-time Updates**: Instantly updates colors as you edit your code
+- 📁 **Import Resolution**: Follows import chains and supports TypeScript path mappings
+- 💾 **Performance Optimized**: Uses intelligent caching for fast analysis
 
-## 使用方法
+## How It Works
 
-1. 拡張機能をインストール
-2. `.jsx`または`.tsx`ファイルを開く
-3. Reactコンポーネントが自動的に色分けされます
+The extension analyzes your React files and:
 
-### コンポーネントタイプ
+- **Server Components**: Components without `'use client'` directive (default: green)
+- **Client Components**: Components from files with `'use client'` directive (default: pink)
 
-- **Server Component**: `'use client'`ディレクティブがないコンポーネント（デフォルト: 緑色）
-- **Client Component**: `'use client'`ディレクティブがあるファイル内のコンポーネント（デフォルト: 赤色）
+## Usage
 
-## 設定
+1. Install the extension
+2. Open any `.jsx`, `.tsx`, `.js`, or `.ts` file with React components
+3. Components are automatically color-coded based on their type
+4. Use the command palette and run "Toggle React Component Highlighting" to enable/disable
 
-VSCodeの設定（settings.json）で以下の項目をカスタマイズできます：
+## Configuration
+
+Customize the extension in your VS Code settings:
 
 ```json
 {
   "reactComponentColor.enable": true,
-  "reactComponentColor.serverComponentColor": "#4CAF50",
-  "reactComponentColor.clientComponentColor": "#FF5722",
-  "reactComponentColor.highlightStyle": "background"
+  "reactComponentColor.serverComponent.backgroundColor": "",
+  "reactComponentColor.serverComponent.borderColor": "",
+  "reactComponentColor.serverComponent.underlineColor": "",
+  "reactComponentColor.serverComponent.textColor": "#4EC9B0",
+  "reactComponentColor.clientComponent.backgroundColor": "",
+  "reactComponentColor.clientComponent.borderColor": "",
+  "reactComponentColor.clientComponent.underlineColor": "",
+  "reactComponentColor.clientComponent.textColor": "#FF719B"
 }
 ```
 
-### 設定項目
+### Available Settings
 
-- `reactComponentColor.enable`: 拡張機能の有効/無効
-- `reactComponentColor.serverComponentColor`: Server Componentの色（16進カラーコード）
-- `reactComponentColor.clientComponentColor`: Client Componentの色（16進カラーコード）
-- `reactComponentColor.highlightStyle`: ハイライトスタイル（`background`, `border`, `underline`）
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `reactComponentColor.enable` | Enable/disable the extension | `true` |
+| `reactComponentColor.serverComponent.*` | Color settings for Server Components | Various |
+| `reactComponentColor.clientComponent.*` | Color settings for Client Components | Various |
 
-## コマンド
+For each component type, you can configure:
+- `backgroundColor`: Background highlight color
+- `borderColor`: Border color around the component
+- `underlineColor`: Underline color
+- `textColor`: Text color of the component name
 
-- `Toggle React Component Highlighting`: コンポーネントハイライトの切り替え
+Set any color to an empty string (`""`) to disable that particular styling.
 
-## サポートファイル
+## Supported File Types
 
-- `.jsx` - JavaScript + JSX
-- `.tsx` - TypeScript + JSX
-- `.js` - JavaScript（JSXを含む場合）
+- `.jsx` - JavaScript with JSX
+- `.tsx` - TypeScript with JSX
+- `.js` - JavaScript (when containing JSX)
+- `.ts` - TypeScript (when containing JSX)
+
+## Commands
+
+- **Toggle React Component Highlighting**: Enable/disable component highlighting
+
+## Advanced Features
+
+### Import Resolution
+The extension intelligently follows import statements to determine component types:
+- Supports relative imports (`./Component`)
+- Supports TypeScript path mappings (`@/components/Button`)
+- Handles index file resolution
+- Works with various import patterns (named, default, namespace)
+
+### Performance
+- Intelligent caching system for fast re-analysis
+- Efficient AST parsing using TypeScript compiler API
+- Minimal performance impact on VS Code
+
+## Requirements
+
+- VS Code 1.100.0 or higher
+- Works best with React 18+ projects using Server/Client Components
+
+## Known Issues
+
+- External package imports are not analyzed for component type
+- Requires `'use client'` directive to be at the top of the file
+
+## Contributing
+
+Found a bug or want to contribute? Visit our [GitHub repository](https://github.com/kage1020/react-component-color).
+
+## Release Notes
+
+### 1.0.0
+
+Initial release with core functionality:
+- Server/Client Component detection
+- Customizable color coding
+- Import chain analysis
+- TypeScript path mapping support
+
+---
+
+**Enjoy coding with better visual React component identification!** 🚀
 - `.ts` - TypeScript（JSXを含む場合）
 
 ## 検出されるコンポーネント

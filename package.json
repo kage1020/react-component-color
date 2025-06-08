@@ -1,14 +1,42 @@
 {
   "name": "react-component-color",
   "displayName": "React Component Color",
-  "description": "Color coding for JSX components based on Server/Client component type",
-  "version": "0.0.1",
+  "description": "Color coding for JSX components based on Server/Client component type in React applications",
+  "version": "1.0.0",
+  "publisher": "kage1020",
+  "author": {
+    "name": "kage1020"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kage1020/react-component-color"
+  },
+  "bugs": {
+    "url": "https://github.com/kage1020/react-component-color/issues"
+  },
+  "homepage": "https://github.com/kage1020/react-component-color#readme",
+  "keywords": [
+    "react",
+    "component",
+    "server component",
+    "client component",
+    "jsx",
+    "tsx",
+    "syntax highlighting",
+    "color coding"
+  ],
   "engines": {
     "vscode": "^1.100.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Themes"
   ],
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
   "activationEvents": [
     "onLanguage:javascript",
     "onLanguage:javascriptreact",
