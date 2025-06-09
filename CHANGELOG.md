@@ -2,9 +2,16 @@
 
 All notable changes to the "react-component-color" extension will be documented in this file.
 
-## [1.0.0] - 2025-01-XX
+## [1.0.1] - 2025-06-09
+
+### Fixed
+
+- Updated extension icon
+
+## [1.0.0] - 2025-06-09
 
 ### Added
+
 - Initial release of React Component Color extension
 - Server/Client Component detection and visual color coding
 - Support for JSX/TSX files (.jsx, .tsx, .js, .ts)
@@ -19,6 +26,7 @@ All notable changes to the "react-component-color" extension will be documented 
 - Configuration validation and error handling
 
 ### Features
+
 - Visual distinction between Server Components (default: teal) and Client Components (default: pink)
 - Intelligent AST-based component parsing using TypeScript compiler API
 - Follows 'use client' directive detection across file boundaries
@@ -27,10 +35,12 @@ All notable changes to the "react-component-color" extension will be documented 
 - Command palette integration for easy toggling
 
 ### Requirements
+
 - VS Code 1.100.0 or higher
 - Compatible with React 18+ Server/Client Component patterns
 
 ### Technical Details
+
 - Modular architecture with separated concerns (parser, cache, decorations, resolver)
 - TypeScript implementation with strict type checking
 - ESBuild-based bundling for optimal performance

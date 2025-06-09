@@ -1678,3 +1678,168 @@ React Component Color拡張機能が VS Code Marketplace に正常に公開さ�
 - GitHub リポジトリとの連携確認
 
 拡張機能が正常に公開され、React開発者コミュニティに貢献する準備が整いました！ 🎊
+
+---
+
+```
+{
+  "name": "react-component-color",
+  "displayName": "React Component Color",
+  "description": "Color coding for JSX components based on Server/Client component type in React applications",
+  "version": "1.0.0",
+  "publisher": "kage1020",
+  "author": {
+    "name": "kage1020"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kage1020/react-component-color"
+  },
+  "bugs": {
+    "url": "https://github.com/kage1020/react-component-color/issues"
+  },
+  "homepage": "https://github.com/kage1020/react-component-color#readme",
+  "keywords": [
+    "react",
+    "component",
+    "server component",
+    "client component",
+    "jsx",
+    "tsx",
+    "syntax highlighting",
+    "color coding"
+  ],
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Other",
+    "Themes"
+  ],
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "react-component-color.toggleHighlight",
+        "title": "Toggle React Component Highlighting"
+      }
+    ],
+    "configuration": {
+      "title": "React Component Color",
+      "properties": {
+        "reactComponentColor.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable color coding for React components"
+        },
+        "reactComponentColor.serverComponent.backgroundColor": {
+          "type": "string",
+          "default": "",
+          "description": "Background color for Server Components (hex color code, empty to disable)"
+        },
+        "reactComponentColor.serverComponent.borderColor": {
+          "type": "string",
+          "default": "",
+          "description": "Border color for Server Components (hex color code, empty to disable)"
+        },
+        "reactComponentColor.serverComponent.underlineColor": {
+          "type": "string",
+          "default": "",
+          "description": "Underline color for Server Components (hex color code, empty to disable)"
+        },
+        "reactComponentColor.serverComponent.textColor": {
+          "type": "string",
+          "default": "#4EC9B0",
+          "description": "Text color for Server Components (hex color code, empty to disable)"
+        },
+        "reactComponentColor.clientComponent.backgroundColor": {
+          "type": "string",
+          "default": "",
+          "description": "Background color for Client Components (hex color code, empty to disable)"
+        },
+        "reactComponentColor.clientComponent.borderColor": {
+          "type": "string",
+          "default": "",
+          "description": "Border color for Client Components (hex color code, empty to disable)"
+        },
+        "reactComponentColor.clientComponent.underlineColor": {
+          "type": "string",
+          "default": "",
+          "description": "Underline color for Client Components (hex color code, empty to disable)"
+        },
+        "reactComponentColor.clientComponent.textColor": {
+          "type": "string",
+          "default": "#FF719B",
+          "description": "Text color for Client Components (hex color code, empty to disable)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.100.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.25.3",
+    "eslint": "^9.25.1",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "json5": "^2.2.3"
+  }
+}
+```
+
+このようなvscode拡張機能を作りました．これにあうシンプルなアイコン画像を作成してください
+
+了解しました。この拡張機能は「React の Server / Client コンポーネントを色分けする VSCode 拡張機能」なので、それにマッチする **シンプルでわかりやすいアイコン** を提案します。
+
+---
+
+### 🎨 アイコンの特徴（生成に使うプロンプト）
+
+- **背景**：ダークグレーまたは黒（VSCodeのダークテーマに馴染む）
+- **中央に大きく「{ }」**：React コンポーネントを象徴（JSX記法を連想させる）
+- **左の「{」がミントグリーン（例: `#4EC9B0`）**：Server Component
+- **右の「}」がピンク（例: `#FF719B`）**：Client Component
+- **角丸・シャドウ**：少し立体感を持たせる
+
+---
+
+### 生成指示（AI用プロンプト例）
+
+> Create a square icon with a dark gray background. In the center, place a large pair of curly braces `{}`. Make the left brace `{` colored in mint green (#4EC9B0) and the right brace `}` in soft pink (#FF719B). Use a modern, minimal style. Add slight drop shadows for contrast.
+
+---
+
+今からこのプロンプトを使って画像を生成します。少々お待ちください。

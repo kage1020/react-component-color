@@ -1,8 +1,8 @@
 {
   "name": "react-component-color",
   "displayName": "React Component Color",
-  "description": "Color coding for JSX components based on Server/Client component type in React applications",
-  "version": "1.0.0",
+  "description": "Color coding for JSX components based on Server/Client component type in React applications.",
+  "version": "1.0.1",
   "publisher": "kage1020",
   "author": {
     "name": "kage1020"
@@ -26,6 +26,7 @@
     "syntax highlighting",
     "color coding"
   ],
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.100.0"
   },
