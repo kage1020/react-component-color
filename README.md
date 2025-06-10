@@ -11,6 +11,9 @@ A VS Code extension that provides visual color coding for React components based
 - 📁 **Import Resolution**: Follows import chains and supports TypeScript path mappings
 - 💾 **Performance Optimized**: Uses intelligent caching for fast analysis
 
+![Server Component](src/images/server-component.png)
+![Client Component](src/images/client-component.png)
+
 ## How It Works
 
 The extension analyzes your React files and:
