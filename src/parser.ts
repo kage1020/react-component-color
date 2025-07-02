@@ -195,6 +195,30 @@ export async function findReactComponents(
 }
 
 /**
+ * コンポーネント定義にClient専用機能が含まれているかを判定
+ */
+function hasClientOnlyFeatures(componentDefinition: string): boolean {
+  // パフォーマンス最適化: 単一のRegExパターンで全てをチェック
+  const clientOnlyPatterns = [
+    // 1. イベントハンドラー
+    '\\bon(?:Click|Submit|Change|Input|Focus|Blur|MouseEnter|MouseLeave|MouseDown|MouseUp|MouseMove|KeyDown|KeyUp|KeyPress|TouchStart|TouchEnd|TouchMove|Scroll|Load|Error|Resize)\\b',
+    
+    // 2. React hooks (React 19の`use`を含む)
+    '\\b(?:useState|useEffect|useContext|useReducer|useCallback|useMemo|useRef|useImperativeHandle|useLayoutEffect|useDebugValue|useDeferredValue|useTransition|useId|useSyncExternalStore|useInsertionEffect|use)\\s*\\(',
+    
+    // 3. カスタムhooksパターン (use で始まる関数呼び出し)
+    '\\buse[A-Z][a-zA-Z0-9]*\\s*\\(',
+    
+    // 4. ブラウザAPI/DOM API
+    '\\b(?:window|document|localStorage|sessionStorage|navigator|location|history|alert|confirm|prompt|setTimeout|setInterval|clearTimeout|clearInterval|fetch|XMLHttpRequest)\\b'
+  ]
+  
+  // 単一のRegExで全パターンをチェック
+  const combinedPattern = new RegExp(clientOnlyPatterns.join('|'), 'g')
+  return combinedPattern.test(componentDefinition)
+}
+
+/**
  * JSX内で使用されているコンポーネントがClient Componentかどうかを判定
  */
 async function determineComponentTypeFromUsage(
@@ -223,8 +247,58 @@ async function determineComponentTypeFromUsage(
   )
 
   if (componentDefinitionRegex.test(text)) {
-    // 同じファイル内で定義されている場合、そのファイルの'use client'状態に従う
-    return await isFileClientComponent(document.uri.fsPath)
+    // 同じファイル内で定義されている場合、まずファイルの'use client'状態をチェック
+    const isFileClient = await isFileClientComponent(document.uri.fsPath)
+    if (isFileClient) {
+      return true
+    }
+
+    // 'use client'がない場合、コンポーネント定義内でClient専用機能を使用しているかチェック
+    // シンプルなアプローチでコンポーネント定義を検索
+    const lines = text.split('\n')
+    let componentDefinition = ''
+    let inComponent = false
+    let braceCount = 0
+    
+    for (const line of lines) {
+      // コンポーネント定義の開始を検出
+      if (!inComponent && new RegExp(`(?:export\\s+)?(?:const|function)\\s+${componentName}\\s*[=(:>]`).test(line)) {
+        inComponent = true
+        componentDefinition = line + '\n'
+        // ブレースカウントを開始
+        for (const char of line) {
+          if (char === '{') {
+            braceCount++
+          } else if (char === '}') {
+            braceCount--
+          }
+        }
+        continue
+      }
+      
+      // コンポーネント内の場合
+      if (inComponent) {
+        componentDefinition += line + '\n'
+        
+        // ブレースをカウント
+        for (const char of line) {
+          if (char === '{') {
+            braceCount++
+          } else if (char === '}') {
+            braceCount--
+          }
+        }
+        
+        // コンポーネント定義の終了
+        if (braceCount <= 0) {
+          break
+        }
+      }
+    }
+    
+    if (componentDefinition && hasClientOnlyFeatures(componentDefinition)) {
+      return true
+    }
   }
 
   // 3. どこで定義されているかわからない場合はServer Componentとして扱う

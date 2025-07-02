@@ -16,10 +16,21 @@ A VS Code extension that provides visual color coding for React components based
 
 ## How It Works
 
-The extension analyzes your React files and:
+The extension analyzes your React files and intelligently determines component types:
 
-- **Server Components**: Components without `'use client'` directive (default: green)
-- **Client Components**: Components from files with `'use client'` directive (default: pink)
+- **Server Components**: Components without `'use client'` directive and no client-only features (default: green)
+- **Client Components**: Components with `'use client'` directive OR components that use client-only features (default: pink)
+
+### Client-Only Feature Detection
+
+The extension automatically detects components that require client-side execution by analyzing:
+
+- **Event handlers**: `onClick`, `onSubmit`, `onChange`, `onFocus`, etc.
+- **React hooks**: `useState`, `useEffect`, `useCallback`, `use` (React 19), etc.
+- **Custom hooks**: Functions starting with "use" that call other hooks
+- **Browser APIs**: `window`, `document`, `localStorage`, `alert`, `fetch`, etc.
+
+This means even without explicit `'use client'` directives, components are correctly identified based on their actual usage patterns.
 
 ## Usage
 
@@ -110,6 +121,13 @@ This extension was inspired by the original idea from [react-component-colors](h
 Found a bug or want to contribute? Visit our [GitHub repository](https://github.com/kage1020/react-component-color).
 
 ## Release Notes
+
+### 1.0.2
+
+- Enhanced client-only feature detection with React 19 `use` hook support
+- Performance optimization with single-pass pattern matching
+- Custom hook detection for improved accuracy
+- Fixed unexpected server component colorization issues
 
 ### 1.0.1
 
