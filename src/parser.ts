@@ -281,30 +281,50 @@ async function determineComponentTypeFromUsage(
     }
 
     // 'use client'がない場合、コンポーネント定義内でClient専用機能を使用しているかチェック
-    // より正確なコンポーネント定義の抽出を試みる
-    const functionDefRegex = new RegExp(
-      `(?:export\\s+)?(?:const|function)\\s+${componentName}\\s*[=:]?\\s*[^{]*\\{[\\s\\S]*?\\n\\}`,
-      'g'
-    )
+    // シンプルなアプローチでコンポーネント定義を検索
+    const lines = text.split('\n')
+    let componentDefinition = ''
+    let inComponent = false
+    let braceCount = 0
     
-    const arrowFunctionRegex = new RegExp(
-      `(?:export\\s+)?const\\s+${componentName}\\s*=\\s*\\([^)]*\\)\\s*=>\\s*[\\s\\S]*?(?=\\n(?:export|const|function|$))`,
-      'g'
-    )
-    
-    let componentDefinition = null
-    let match = functionDefRegex.exec(text)
-    if (match) {
-      componentDefinition = match[0]
-    } else {
-      match = arrowFunctionRegex.exec(text)
-      if (match) {
-        componentDefinition = match[0]
+    for (const line of lines) {
+      // コンポーネント定義の開始を検出
+      if (!inComponent && new RegExp(`(?:export\\s+)?(?:const|function)\\s+${componentName}\\s*[=(:>]`).test(line)) {
+        inComponent = true
+        componentDefinition = line + '\n'
+        // ブレースカウントを開始
+        for (const char of line) {
+          if (char === '{') {
+            braceCount++
+          } else if (char === '}') {
+            braceCount--
+          }
+        }
+        continue
+      }
+      
+      // コンポーネント内の場合
+      if (inComponent) {
+        componentDefinition += line + '\n'
+        
+        // ブレースをカウント
+        for (const char of line) {
+          if (char === '{') {
+            braceCount++
+          } else if (char === '}') {
+            braceCount--
+          }
+        }
+        
+        // コンポーネント定義の終了
+        if (braceCount <= 0) {
+          break
+        }
       }
     }
     
-    if (componentDefinition) {
-      return hasClientOnlyFeatures(componentDefinition)
+    if (componentDefinition && hasClientOnlyFeatures(componentDefinition)) {
+      return true
     }
   }
 
