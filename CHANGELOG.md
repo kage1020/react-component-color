@@ -2,6 +2,25 @@
 
 All notable changes to the "react-component-color" extension will be documented in this file.
 
+## [1.0.2] - 2025-06-09
+
+### Added
+
+- React 19 `use` hook detection for client components
+- Custom hook pattern detection (hooks starting with "use")
+- Enhanced client-only feature detection for improved accuracy
+
+### Improved
+
+- Performance optimization: Combined multiple loops into single RegExp pattern matching
+- More efficient component analysis with reduced computational overhead
+- Better detection of client components without explicit `'use client'` directive
+
+### Fixed
+
+- Fixed unexpected server component colorization for components with client-only features
+- Components with event handlers, React hooks, or browser APIs are now correctly identified as client components
+
 ## [1.0.1] - 2025-06-09
 
 ### Fixed

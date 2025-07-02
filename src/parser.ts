@@ -198,51 +198,24 @@ export async function findReactComponents(
  * コンポーネント定義にClient専用機能が含まれているかを判定
  */
 function hasClientOnlyFeatures(componentDefinition: string): boolean {
-  // 1. イベントハンドラーのチェック
-  const eventHandlers = [
-    'onClick', 'onSubmit', 'onChange', 'onInput', 'onFocus', 'onBlur',
-    'onMouseEnter', 'onMouseLeave', 'onMouseDown', 'onMouseUp', 'onMouseMove',
-    'onKeyDown', 'onKeyUp', 'onKeyPress', 'onTouchStart', 'onTouchEnd',
-    'onTouchMove', 'onScroll', 'onLoad', 'onError', 'onResize'
+  // パフォーマンス最適化: 単一のRegExパターンで全てをチェック
+  const clientOnlyPatterns = [
+    // 1. イベントハンドラー
+    '\\bon(?:Click|Submit|Change|Input|Focus|Blur|MouseEnter|MouseLeave|MouseDown|MouseUp|MouseMove|KeyDown|KeyUp|KeyPress|TouchStart|TouchEnd|TouchMove|Scroll|Load|Error|Resize)\\b',
+    
+    // 2. React hooks (React 19の`use`を含む)
+    '\\b(?:useState|useEffect|useContext|useReducer|useCallback|useMemo|useRef|useImperativeHandle|useLayoutEffect|useDebugValue|useDeferredValue|useTransition|useId|useSyncExternalStore|useInsertionEffect|use)\\s*\\(',
+    
+    // 3. カスタムhooksパターン (use で始まる関数呼び出し)
+    '\\buse[A-Z][a-zA-Z0-9]*\\s*\\(',
+    
+    // 4. ブラウザAPI/DOM API
+    '\\b(?:window|document|localStorage|sessionStorage|navigator|location|history|alert|confirm|prompt|setTimeout|setInterval|clearTimeout|clearInterval|fetch|XMLHttpRequest)\\b'
   ]
   
-  for (const handler of eventHandlers) {
-    if (componentDefinition.includes(handler)) {
-      return true
-    }
-  }
-
-  // 2. React hooksのチェック
-  const reactHooks = [
-    'useState', 'useEffect', 'useContext', 'useReducer', 'useCallback',
-    'useMemo', 'useRef', 'useImperativeHandle', 'useLayoutEffect',
-    'useDebugValue', 'useDeferredValue', 'useTransition', 'useId',
-    'useSyncExternalStore', 'useInsertionEffect'
-  ]
-  
-  for (const hook of reactHooks) {
-    // hook名の前後に適切な境界があることを確認
-    const hookRegex = new RegExp(`\\b${hook}\\s*\\(`, 'g')
-    if (hookRegex.test(componentDefinition)) {
-      return true
-    }
-  }
-
-  // 3. ブラウザAPI/DOM APIのチェック
-  const browserApis = [
-    'window', 'document', 'localStorage', 'sessionStorage', 'navigator',
-    'location', 'history', 'alert', 'confirm', 'prompt', 'setTimeout',
-    'setInterval', 'clearTimeout', 'clearInterval', 'fetch', 'XMLHttpRequest'
-  ]
-  
-  for (const api of browserApis) {
-    const apiRegex = new RegExp(`\\b${api}\\b`, 'g')
-    if (apiRegex.test(componentDefinition)) {
-      return true
-    }
-  }
-
-  return false
+  // 単一のRegExで全パターンをチェック
+  const combinedPattern = new RegExp(clientOnlyPatterns.join('|'), 'g')
+  return combinedPattern.test(componentDefinition)
 }
 
 /**
