@@ -195,6 +195,57 @@ export async function findReactComponents(
 }
 
 /**
+ * コンポーネント定義にClient専用機能が含まれているかを判定
+ */
+function hasClientOnlyFeatures(componentDefinition: string): boolean {
+  // 1. イベントハンドラーのチェック
+  const eventHandlers = [
+    'onClick', 'onSubmit', 'onChange', 'onInput', 'onFocus', 'onBlur',
+    'onMouseEnter', 'onMouseLeave', 'onMouseDown', 'onMouseUp', 'onMouseMove',
+    'onKeyDown', 'onKeyUp', 'onKeyPress', 'onTouchStart', 'onTouchEnd',
+    'onTouchMove', 'onScroll', 'onLoad', 'onError', 'onResize'
+  ]
+  
+  for (const handler of eventHandlers) {
+    if (componentDefinition.includes(handler)) {
+      return true
+    }
+  }
+
+  // 2. React hooksのチェック
+  const reactHooks = [
+    'useState', 'useEffect', 'useContext', 'useReducer', 'useCallback',
+    'useMemo', 'useRef', 'useImperativeHandle', 'useLayoutEffect',
+    'useDebugValue', 'useDeferredValue', 'useTransition', 'useId',
+    'useSyncExternalStore', 'useInsertionEffect'
+  ]
+  
+  for (const hook of reactHooks) {
+    // hook名の前後に適切な境界があることを確認
+    const hookRegex = new RegExp(`\\b${hook}\\s*\\(`, 'g')
+    if (hookRegex.test(componentDefinition)) {
+      return true
+    }
+  }
+
+  // 3. ブラウザAPI/DOM APIのチェック
+  const browserApis = [
+    'window', 'document', 'localStorage', 'sessionStorage', 'navigator',
+    'location', 'history', 'alert', 'confirm', 'prompt', 'setTimeout',
+    'setInterval', 'clearTimeout', 'clearInterval', 'fetch', 'XMLHttpRequest'
+  ]
+  
+  for (const api of browserApis) {
+    const apiRegex = new RegExp(`\\b${api}\\b`, 'g')
+    if (apiRegex.test(componentDefinition)) {
+      return true
+    }
+  }
+
+  return false
+}
+
+/**
  * JSX内で使用されているコンポーネントがClient Componentかどうかを判定
  */
 async function determineComponentTypeFromUsage(
@@ -223,8 +274,38 @@ async function determineComponentTypeFromUsage(
   )
 
   if (componentDefinitionRegex.test(text)) {
-    // 同じファイル内で定義されている場合、そのファイルの'use client'状態に従う
-    return await isFileClientComponent(document.uri.fsPath)
+    // 同じファイル内で定義されている場合、まずファイルの'use client'状態をチェック
+    const isFileClient = await isFileClientComponent(document.uri.fsPath)
+    if (isFileClient) {
+      return true
+    }
+
+    // 'use client'がない場合、コンポーネント定義内でClient専用機能を使用しているかチェック
+    // より正確なコンポーネント定義の抽出を試みる
+    const functionDefRegex = new RegExp(
+      `(?:export\\s+)?(?:const|function)\\s+${componentName}\\s*[=:]?\\s*[^{]*\\{[\\s\\S]*?\\n\\}`,
+      'g'
+    )
+    
+    const arrowFunctionRegex = new RegExp(
+      `(?:export\\s+)?const\\s+${componentName}\\s*=\\s*\\([^)]*\\)\\s*=>\\s*[\\s\\S]*?(?=\\n(?:export|const|function|$))`,
+      'g'
+    )
+    
+    let componentDefinition = null
+    let match = functionDefRegex.exec(text)
+    if (match) {
+      componentDefinition = match[0]
+    } else {
+      match = arrowFunctionRegex.exec(text)
+      if (match) {
+        componentDefinition = match[0]
+      }
+    }
+    
+    if (componentDefinition) {
+      return hasClientOnlyFeatures(componentDefinition)
+    }
   }
 
   // 3. どこで定義されているかわからない場合はServer Componentとして扱う
