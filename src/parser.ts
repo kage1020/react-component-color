@@ -1,11 +1,8 @@
+import * as ts from "typescript"
 import * as vscode from "vscode"
 import { cacheManager } from "./cache"
 import { resolveImportPath } from "./resolver"
 import { ComponentInfo, ImportInfo } from "./types"
-
-/**
- * JSX component parser that uses regex-based parsing to reduce bundle size
- */
 
 /**
  * ファイルがClient Componentかどうかを判定（キャッシュ付き）
@@ -94,8 +91,7 @@ export async function parseImports(
 }
 
 /**
- * JSX component detection using regex patterns
- * Replaces TypeScript AST parsing to reduce bundle size
+ * React componentsを検索してComponentInfo配列を返す
  */
 export async function findReactComponents(
   text: string,
@@ -107,42 +103,77 @@ export async function findReactComponents(
     range: vscode.Range
   }> = []
 
-  // Regex patterns for JSX elements
-  const jsxPatterns = [
-    // Opening JSX tags: <Component> or <Component prop="value">
-    /<([A-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)*)\s*[^>]*>/g,
-    // Self-closing JSX tags: <Component /> or <Component prop="value" />
-    /<([A-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)*)\s*[^>]*\/>/g,
-    // Closing JSX tags: </Component>
-    /<\/([A-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)*)\s*>/g,
-  ]
+  // TypeScript ASTを作成
+  const sourceFile = ts.createSourceFile(
+    document.fileName,
+    text,
+    ts.ScriptTarget.Latest,
+    true,
+    document.fileName.endsWith(".tsx") || document.fileName.endsWith(".jsx")
+      ? ts.ScriptKind.TSX
+      : ts.ScriptKind.TS
+  )
 
-  // Process each pattern
-  for (const pattern of jsxPatterns) {
-    let match
-    while ((match = pattern.exec(text)) !== null) {
-      const fullComponentName = match[1]
-      const baseComponentName = fullComponentName.split(".")[0]
-      
-      // Skip if it's not a React component (must start with uppercase)
-      if (!/^[A-Z]/.test(baseComponentName)) {
-        continue
+  // ASTを走査してJSXエレメントを検出
+  function visit(node: ts.Node) {
+    // JSX開始エレメント (<Component> または <Component />)
+    if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
+      const tagName = node.tagName
+      if (ts.isIdentifier(tagName) || ts.isPropertyAccessExpression(tagName)) {
+        const componentName = getComponentName(tagName)
+        if (componentName && /^[A-Z]/.test(componentName)) {
+          addComponentInfo(node, componentName, tagName)
+        }
       }
-
-      // Calculate position in document
-      const matchStart = match.index + match[0].indexOf(fullComponentName)
-      const matchEnd = matchStart + fullComponentName.length
-
-      const startPos = document.positionAt(matchStart)
-      const endPos = document.positionAt(matchEnd)
-
-      componentInfos.push({
-        fullComponentName,
-        baseComponentName,
-        range: new vscode.Range(startPos, endPos),
-      })
     }
+
+    // JSX閉じエレメント (</Component>)
+    if (ts.isJsxClosingElement(node)) {
+      const tagName = node.tagName
+      if (ts.isIdentifier(tagName) || ts.isPropertyAccessExpression(tagName)) {
+        const componentName = getComponentName(tagName)
+        if (componentName && /^[A-Z]/.test(componentName)) {
+          addComponentInfo(node, componentName, tagName)
+        }
+      }
+    }
+
+    ts.forEachChild(node, visit)
   }
+
+  // コンポーネント名を取得
+  function getComponentName(tagName: ts.JsxTagNameExpression): string {
+    if (ts.isIdentifier(tagName)) {
+      return tagName.text
+    }
+    if (ts.isPropertyAccessExpression(tagName)) {
+      return tagName.getText(sourceFile)
+    }
+    return ""
+  }
+
+  // コンポーネント情報を収集（同期）
+  function addComponentInfo(
+    node: ts.Node,
+    fullComponentName: string,
+    tagNameNode: ts.JsxTagNameExpression
+  ) {
+    const baseComponentName = fullComponentName.split(".")[0]
+    const start = tagNameNode.getStart(sourceFile)
+    const end = tagNameNode.getEnd()
+
+    const startPos = document.positionAt(start)
+    const endPos = document.positionAt(end)
+
+    componentInfos.push({
+      fullComponentName,
+      baseComponentName,
+      range: new vscode.Range(startPos, endPos),
+    })
+  }
+
+  // AST走査を開始
+  visit(sourceFile)
 
   // 非同期でコンポーネントタイプを判定
   const components: ComponentInfo[] = await Promise.all(
