@@ -1,7 +1,7 @@
 import * as vscode from "vscode"
 import { cacheManager } from "./cache"
 import { decorationManager } from "./decorations"
-import { findReactComponents } from "./lightweight-parser"
+import { findReactComponents } from "./parser"
 
 let isEnabled = true
 

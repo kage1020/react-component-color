@@ -4,8 +4,7 @@ import { resolveImportPath } from "./resolver"
 import { ComponentInfo, ImportInfo } from "./types"
 
 /**
- * Lightweight JSX component parser that replaces TypeScript AST parsing
- * with regex-based parsing to dramatically reduce bundle size
+ * JSX component parser that uses regex-based parsing to reduce bundle size
  */
 
 /**
@@ -95,7 +94,7 @@ export async function parseImports(
 }
 
 /**
- * Lightweight JSX component detection using regex patterns
+ * JSX component detection using regex patterns
  * Replaces TypeScript AST parsing to reduce bundle size
  */
 export async function findReactComponents(
