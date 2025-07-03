@@ -2,7 +2,7 @@
 
 All notable changes to the "react-component-color" extension will be documented in this file.
 
-## [1.0.2] - 2025-07-02
+## [1.0.3] - 2025-07-02
 
 ### Added
 

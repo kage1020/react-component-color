@@ -2,7 +2,7 @@
   "name": "react-component-color",
   "displayName": "React Component Color",
   "description": "Color coding for JSX components based on Server/Client component type in React applications.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "publisher": "kage1020",
   "author": {
     "name": "kage1020"

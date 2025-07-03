@@ -26,7 +26,7 @@ The extension analyzes your React files and intelligently determines component t
 The extension automatically detects components that require client-side execution by analyzing:
 
 - **Event handlers**: `onClick`, `onSubmit`, `onChange`, `onFocus`, etc.
-- **React hooks**: `useState`, `useEffect`, `useCallback`, `use` (React 19), etc.
+- **React hooks**: `useState`, `useEffect`, `useCallback`, `use`, etc.
 - **Custom hooks**: Functions starting with "use" that call other hooks
 - **Browser APIs**: `window`, `document`, `localStorage`, `alert`, `fetch`, etc.
 
@@ -105,12 +105,11 @@ The extension intelligently follows import statements to determine component typ
 ## Requirements
 
 - VS Code 1.100.0 or higher
-- Works best with React 18+ projects using Server/Client Components
+- Works best with React 19+ projects using Server/Client Components
 
 ## Known Issues
 
 - External package imports are not analyzed for component type
-- Requires `'use client'` directive to be at the top of the file
 
 ## Acknowledgements
 
@@ -122,25 +121,10 @@ Found a bug or want to contribute? Visit our [GitHub repository](https://github.
 
 ## Release Notes
 
-### 1.0.2
+### 1.0.3
 
-- Enhanced client-only feature detection with React 19 `use` hook support
-- Performance optimization with single-pass pattern matching
-- Custom hook detection for improved accuracy
+- Enhanced client-only feature detection
 - Fixed unexpected server component colorization issues
-
-### 1.0.1
-
-- Updated extension icon
-
-### 1.0.0
-
-Initial release with core functionality:
-
-- Server/Client Component detection
-- Customizable color coding
-- Import chain analysis
-- TypeScript path mapping support
 
 ---
 
